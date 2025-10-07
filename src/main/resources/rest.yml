@@ -1,0 +1,5 @@
+rest:
+  clients:
+    timeout:
+      connect-timeout: ${CONNECT_TIMEOUT:5s}
+      read-timeout: ${READ_TIMEOUT:30s}

@@ -1,0 +1,25 @@
+spring:
+  config:
+    activate:
+      on-profile: ssl
+  ssl:
+    bundle:
+      jks:
+        kafka:
+          truststore:
+            location: ${KAFKA_TRUSTSTORE_LOCATION:/certs/truststore.jks}
+            password: ${KAFKA_TRUSTSTORE_PASS}
+          keystore:
+            location: ${KAFKA_KEYSTORE_LOCATION:/certs/keystore.jks}
+            password: ${KAFKA_KEYSTORE_PASS}
+          key:
+            password: ${KAFKA_KEY_PASS}
+        rest:
+          truststore:
+            location: ${WEB_CLIENT_TRUSTSTORE_LOCATION:/certs/truststore.pfx}
+            password: ${WEB_CLIENT_TRUSTSTORE_PASS}
+          keystore:
+            location: ${WEB_CLIENT_KEYSTORE_LOCATION:/certs/keystore.pfx}
+            password: ${WEB_CLIENT_KEYSTORE_PASS}
+
+sandwich.kafka.ssl.bundle: kafka
