@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +27,7 @@ public class DeliveryController {
 
     private final DeliveryService service;
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<PageData<DeliveryDto>> search(@Valid @RequestBody PaginationRequest<DeliveryFilter> request) {
         return ResponseEntity.ok(service.search(request));
     }
@@ -39,7 +38,7 @@ public class DeliveryController {
     }
 
     @PostMapping("/change-status/{id}")
-    public ResponseEntity<Void> create(@PathVariable UUID id, @RequestParam DeliveryStatus status) {
+    public ResponseEntity<Void> changeStatus(@PathVariable UUID id, @RequestParam DeliveryStatus status) {
         service.changeStatus(id, status);
         return ResponseEntity.ok().build();
     }
