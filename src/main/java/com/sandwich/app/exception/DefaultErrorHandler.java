@@ -2,7 +2,6 @@ package com.sandwich.app.exception;
 
 import com.sandwich.app.models.exception.AppExceptionResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -10,10 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class DefaultErrorHandler {
 
     @ExceptionHandler
-    public ResponseEntity<AppExceptionResponse> defaultHandler(Throwable exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(new AppExceptionResponse()
-                .setStatus(HttpStatus.BAD_REQUEST)
-                .setErrorMessage(exception.getMessage()));
+    public AppExceptionResponse defaultHandler(Throwable exception) {
+        return new AppExceptionResponse()
+            .setStatus(HttpStatus.BAD_REQUEST)
+            .setErrorMessage(exception.getMessage());
     }
 }

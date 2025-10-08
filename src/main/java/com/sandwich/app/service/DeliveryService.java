@@ -61,6 +61,7 @@ public class DeliveryService {
         );
 
         var newDelivery = mapper.convert(new DeliveryEntity(), delivery);
+        newDelivery.setStatus(DeliveryStatus.CREATED);
         return repository.save(newDelivery).getId();
     }
 
