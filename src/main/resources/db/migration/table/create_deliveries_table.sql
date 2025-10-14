@@ -10,5 +10,10 @@ create table if not exists deliveries
     restaurant_id uuid not null,
     address text not null,
     comment text,
-    status varchar(64) not null
+    status varchar(64) not null,
+    courier_id uuid,
+    created_at timestamp without time zone not null default now(),
+    constraint deliveries_courier_id_fkey
+        foreign key (courier_id)
+            references couriers (id)
 );

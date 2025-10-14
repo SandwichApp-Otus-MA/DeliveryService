@@ -6,6 +6,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,7 +16,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldNameConstants;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -41,5 +46,13 @@ public class DeliveryEntity extends DomainObject {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private DeliveryStatus status = DeliveryStatus.CREATED;
+
+    @JoinColumn(name = "courier_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CourierEntity courier;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Instant createdAt;
 
 }

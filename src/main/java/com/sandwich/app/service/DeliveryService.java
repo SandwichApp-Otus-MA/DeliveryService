@@ -17,10 +17,13 @@ import com.sandwich.app.models.pagination.PaginationRequest;
 import com.sandwich.app.query.builder.DeliveryQueryBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,8 +82,22 @@ public class DeliveryService {
             orderEventProducer.send(changedDelivery.getOrderId(), orderStatus));
     }
 
+    public void change(DeliveryEntity delivery) {
+        repository.save(delivery);
+        Optional.ofNullable(getOrderStatusOrNull(delivery.getStatus())).ifPresent(orderStatus ->
+            orderEventProducer.send(delivery.getOrderId(), orderStatus));
+    }
+
+    @Transactional
+    public List<DeliveryEntity> startSearchCourier() {
+        var sorting = Sort.by(Sort.Order.desc("createdAt"));
+        return repository.findAllByStatus(DeliveryStatus.CREATED, PageRequest.of(0, 50, sorting)).stream()
+            .map(d -> d.setStatus(DeliveryStatus.SEARCH_COURIER))
+            .toList();
+    }
+
     public void cancel(UUID deliveryId, UUID orderId) {
-        transactionTemplate.executeWithoutResult(status -> {
+        transactionTemplate.executeWithoutResult(status ->
             repository.findByOrderId(orderId).ifPresentOrElse(existDelivery -> {
                     if (Objects.equals(deliveryId, existDelivery.getId())) {
                         existDelivery.setStatus(DeliveryStatus.CANCELED);
@@ -90,10 +107,15 @@ public class DeliveryService {
                 }, () -> {
                     throw new IllegalArgumentException("Не найдена запись о доставке для orderId: %s и deliveryId: %s".formatted(orderId, deliveryId));
                 }
-            );
-        });
+            ));
 
         orderEventProducer.send(orderId, OrderStatus.DELIVERY_FAILED);
+    }
+
+    public void cancel(DeliveryEntity delivery) {
+        delivery.setStatus(DeliveryStatus.CANCELED);
+        repository.save(delivery);
+        orderEventProducer.send(delivery.getOrderId(), OrderStatus.DELIVERY_FAILED);
     }
 
     private OrderStatus getOrderStatusOrNull(DeliveryStatus status) {
