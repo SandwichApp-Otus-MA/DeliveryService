@@ -10,6 +10,7 @@ import com.sandwich.app.kafka.OrderEventProducer;
 import com.sandwich.app.mapper.DeliveryMapper;
 import com.sandwich.app.models.model.delivery.DeliveryDto;
 import com.sandwich.app.models.model.delivery.DeliveryFilter;
+import com.sandwich.app.models.model.enums.CourierStatus;
 import com.sandwich.app.models.model.enums.DeliveryStatus;
 import com.sandwich.app.models.model.enums.OrderStatus;
 import com.sandwich.app.models.pagination.PageData;
@@ -72,6 +73,10 @@ public class DeliveryService {
         var changedDelivery = transactionTemplate.execute(ts -> {
             var delivery = repository.findById(deliveryId)
                 .orElseThrow(() -> new EntityNotFoundException("Delivery with id: %s not found!".formatted(deliveryId)));
+
+            if (status == DeliveryStatus.COMPLETED || status == DeliveryStatus.CANCELED) {
+                delivery.getCourier().setStatus(CourierStatus.ONLINE);
+            }
 
             return delivery.setStatus(status);
         });
